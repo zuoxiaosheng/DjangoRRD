@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>RRD File List</h1>
+<table class="table table-bordered">
+  <tbody>
+    {% for rrd in rrds %}
+      <tr>
+        <td>{{ rrd }}</td>
+        <td><a href='/info/{{ rrd }}'>Header Info</a></td>
+        <td><a href='/raw/{{ rrd }}'>Raw Data</a></td>
+        <td><a href='/graph/{{ rrd }}'>Graph</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

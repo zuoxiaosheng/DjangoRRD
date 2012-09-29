@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>RRD Header Info</h1>
+<table class="table table-bordered">
+  <tbody>
+    {% for rrd in rrds %}
+      <tr>
+        <td>{{ rrd }}</td>
+        <td><a href='/info/{{ rrd }}'>Header Info</a></td>
+        <td><a href='/raw/{{ rrd }}'>Raw Data</a></td>
+        <td><a href='/graph/{{ rrd }}'>Graph</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table class="table table-bordered">
+  <tbody>
+    <tr>
+      <td>RRD File</td>
+      <td colspan=5>{{ info.filename }}</td>
+    </tr>
+    <tr>
+      <td>Min Step</td>
+      <td colspan=5>{{ info.step }}</td>
+    </tr>
+    <tr>
+      <td>Last update</td>
+      <td colspan=5>{{ info.lastupdate }}</td>
+    </tr>
+    <tr>
+      <td rowspan={{ info.ds.__len__() }}>DS list</td>
+      <td>{{ info.ds[0].name }}</td>
+      <td colspan=4>{{ info.ds[0].type }}</td>
+    </tr>
+    {% for i in range(1, info.ds.__len__()) %}
+    <tr>
+      <td>{{ info.ds[i].name }}</td>
+      <td colspan=4>{{ info.ds[i].type }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td rowspan={{ info.rra.__len__() }}>RRA list</td>
+      <td>0</td>
+      <td>Rows</td>
+      <td>{{ info.rra[0].rows }}</td>
+      <td>Step</td>
+      <td>{{ info.rra[0].step }}</td>
+    </tr>
+    {% for i in range(1,info.rra.__len__()) %}
+    <tr>
+      <td>{{ i }}</td>
+      <td>Rows</td>
+      <td>{{ info.rra[i].rows }}</td>
+      <td>Step</td>
+      <td>{{ info.rra[i].step }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

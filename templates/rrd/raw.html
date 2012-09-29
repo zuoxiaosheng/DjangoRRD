@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>RRD Raw Content</h1>
+<div>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><b>{{ info.filename }}</b></td>
+    	  <td>DS: <select id="select_ds">
+          {% for ds in info.ds %}
+            <option>{{ ds.name }}</option>
+          {% endfor %}
+        </select></td>
+    	  <td>RRA: <select id="select_rra">
+          {%  for i in range(info.rra.__len__()) %}
+            <option>{{ i }}</option>
+          {% endfor %}
+        </select></td>
+        <td>Columns: <select id="select_columns">
+          <option value="1"/>1</option>
+          <option value="2"/>2</option>
+          <option value="4"/>4</option>
+          <option value="5"/>5</option>
+          <option value="10"/>10</option>
+          <option value="20" selected/>20</option>
+        </select></td>
+    	  <td><button id="dsrra_button" onclick="element_update()">Update</button></td>
+    	</tr>
+    </tbody>
+  </table>
+  <table id="infotable" border=1>
+    <tr><th colspan="21">Data</th></tr>
+  </table>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+  function element_update() {
+    ds = $('#select_ds').val();
+    rra = $('#select_rra').val();
+    col = $('#select_columns').val();
+
+    // cleanup
+    // rows may have been added during previous updates
+    var oTable=document.getElementById("infotable");
+    var oRow=undefined;
+    $.get('/data/{{ info.filename }}/'+ds+'/'+rra, function(result) {
+      console.log(result);
+      var result = eval('(' + result + ')');
+      for (var i in result) {
+        if ((i%col)==0) {
+          // One new row every col
+          oRow=oTable.insertRow(-1);
+          var oCell=oRow.insertCell(-1);
+          oCell.innerHTML=i;
+        }
+        var oCell=oRow.insertCell(-1);
+        oCell.colSpan=20/col;
+        var el=result[i][1];
+        if (el!=undefined) {
+         oCell.innerHTML=Math.round(el);
+        } else {
+         oCell.innerHTML="-";
+        }
+      }
+    })
+  } 
+</script>
+{% endblock %}

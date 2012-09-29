@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>RRD Graphs with Highchart</h1>
+<div>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><b>{{ info.filename }}</b></td>
+    	  <td>DS: <select id="select_ds">
+          {% for ds in info.ds %}
+            <option>{{ ds.name }}</option>
+          {% endfor %}
+        </select></td>
+    	  <td>RRA: <select id="select_rra">
+          {%  for i in range(info.rra.__len__()) %}
+            <option>{{ i }}</option>
+          {% endfor %}
+        </select></td>
+    	  <td><button id="dsrra_button" onclick="element_update()">Update</button></td>
+    	</tr>
+  </table>
+  <div id="graph" style="width:auto; heigth:auto; margin-left:5px; float:left;"></div>
+</div>
+{% endblock %}
+{% block script %}
+<script src="/static/js/highcharts.js"></script>
+<script type="text/javascript">
+Highcharts.setOptions({
+  global: {
+    useUTC: false
+  }
+});
+function createStockOption() {
+    var option = {
+        chart : {
+          renderTo: 'View',
+          type: 'spline',
+          marginRight: 10,
+          events: {},
+          zoomType: 'x',
+        },
+
+        title: {
+            text: 'title'
+        },
+
+        xAxis: {
+            gapGridLineWidth: 0
+        },
+        yAxis: {
+            title: {
+                text: 'Value'
+            }
+        },
+        rangeSelector : {
+            enabled: false,
+        },
+        navigator : {
+            enabled : false
+        },
+        scrollbar: {
+            enabled: false
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>'+ this.series.name +'</b><br/>'+
+                 Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+                 Highcharts.numberFormat(this.y, 2);
+            }
+        },
+        series : [{
+            marker: {
+              enabled: false
+            },
+            name : 'name',
+            //type: 'area',
+            data : [],
+        }]
+    };
+    return option;
+}
+
+function fresh(rrd, ds, rra, step) {
+    return {
+        load: function() {
+            // set up the updating of the chart each second
+            var series = this.series;
+            setInterval(function() {
+                $.get('/fresh/{{ info.filename }}/'+ds+'/'+rra, function(result){
+                      var x = result[0]; // current time
+                      var y = result[1];
+                      series[0].addPoint([x, y], true, true);
+                });
+            }, step);
+        }
+    };
+}
+
+function element_update() {
+  ds = $('#select_ds').val();
+  rra = $('#select_rra').val();
+  $.get('/data/{{ info.filename }}/'+ds+'/'+rra, function(result) {
+    var data = [];
+    //var step = result[1][0] - result[0][0];
+    var option = createStockOption();
+    option.chart.renderTo = 'graph';
+    option.yAxis.title.text = 'unit';
+    option.title.text = ds;
+    //option.chart.events = fresh('{{ info.rrdFile }}', ds, rra, step);
+    option.series[0].name = ds;
+    option.series[0].data = result;
+    new Highcharts.Chart(option);
+  })
+} 
+</script>
+{% endblock %}

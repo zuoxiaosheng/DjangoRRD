@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+	<head>
+	    <title>{% block title %}{% endblock %}</title>
+	    <!-- Icons -->
+	  	<link rel="shortcut icon" href="/favicon.ico">
+	  	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+	  	<!-- CSS Styles -->
+	  	<link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+	    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap-responsive.css">
+	    <!-- Javascripts -->
+	    <script src="/static/js/jquery-1.7.2.min.js"></script>
+	    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+	    {% block content %}{% endblock %}
+	    {% block footer %}
+	    <hr>
+	    <p>Thanks for visiting my site.</p>
+	    {% endblock %}
+	</body>
+</html>
+{% block script %}{% endblock %}
